@@ -15,20 +15,20 @@ FROM archlinux:latest
 COPY --from=build /opt/slmix /opt/slmix
 
 RUN pacman -Syu --noconfirm ca-certificates gd opus zlib ffmpeg flac lmdb \
-    nginx supervisor sudo && \
+    nginx sudo && \
     yes | pacman -Scc && \
     useradd slmix -d /opt/slmix -s /bin/bash -u 16371 -U && \
     mkdir -p /opt/slmix/webui/public/avatars && \
-    mkdir -p /opt/slmix/webui/public/downloads && \
+    mkdir -p /opt/slmix/webui/public/download && \
+    echo "<!doctype html><html lang=\"en\"><title>Download</title><b>Use /download/TOKEN</b></html>" > /opt/slmix/webui/public/download/index.html && \
     mkdir -p /opt/slmix/webui/database && \
     chown -R slmix:slmix /opt/slmix && \
-    echo 'slmix ALL=(ALL) NOPASSWD:SETENV: /usr/bin/supervisord' >> /etc/sudoers
+    echo 'slmix ALL=(ALL) NOPASSWD:SETENV: /usr/bin/nginx' >> /etc/sudoers
 
-COPY docker/supervisord.conf /etc/supervisord.conf
 COPY docker/nginx.conf /etc/nginx/nginx.conf
 
 VOLUME /opt/slmix/webui/public/avatars
-VOLUME /opt/slmix/webui/public/downloads
+VOLUME /opt/slmix/webui/public/download
 VOLUME /opt/slmix/webui/database
 
 USER slmix 
